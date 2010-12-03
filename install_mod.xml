@@ -20,20 +20,20 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 				</contributions-group>
 			</author>
 			<author>
-				<realname><![CDATA[William Jacoby]]></realname>
-				<username><![CDATA[bonelifer]]></username>
-				<homepage><![CDATA[http://phpbbmodders.net]]></homepage>
-				<contributions-group>
-					<contributions status="current" from="2010-10-27" position="Graphics artist"/>
-					<contributions status="current" from="2010-10-27" position="Tester"/>
-				</contributions-group>
-			</author>
-			<author>
 				<realname><![CDATA[Rich McGirr]]></realname>
 				<username><![CDATA[RMcGirr83]]></username>
 				<homepage><![CDATA[http://rmcgirr83.org]]></homepage>
 				<email><![CDATA[rmcgirr83@rmcgirr83.org]]></email>
 				<contributions-group>
+					<contributions status="current" from="2010-10-27" position="Developer"/>
+				</contributions-group>
+			</author>			
+			<author>
+				<realname><![CDATA[William Jacoby]]></realname>
+				<username><![CDATA[bonelifer]]></username>
+				<homepage><![CDATA[http://phpbbmodders.net]]></homepage>
+				<contributions-group>
+					<contributions status="current" from="2010-10-27" position="Graphics artist"/>
 					<contributions status="current" from="2010-10-27" position="Tester"/>
 				</contributions-group>
 			</author>
@@ -44,11 +44,11 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 				</contributions-group>
 			</author>
 		</author-group>
-		<mod-version>1.0.0</mod-version>
+		<mod-version>1.0.0a</mod-version>
 		<installation>
 			<level>easy</level>
 			<time>300</time>
-			<target-version>3.0.7-PL1</target-version>
+			<target-version>3.0.8</target-version>
 		</installation>
 		<history>
 			<entry>
@@ -58,18 +58,25 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 					<change><![CDATA[Initial release]]></change>
 				</changelog>
 			</entry>
+			<entry>
+				<date>2010-12-03</date>
+				<rev-version>1.0.0a</rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Bug fix to viewtopic]]></change>
+				</changelog>
+			</entry>			
 		</history>
 	</header>
 	<action-group>
 		<copy>
-			<file from="root/*.*" to="*.*"/>
+			<file from="root/*.*" to="*.*" />
 		</copy>
 		<open src="viewtopic.php">
 			<edit>
 				<comment lang="en"><![CDATA[Replace phpBBModders in the edit below with your own tag.
 ]]></comment>
-				<find><![CDATA[$voted_id = (sizeof($voted_id) > 1) ? array_unique($voted_id) : $voted_id;]]></find>
-				<action type="after-add"><![CDATA[if ($auth->acl_get_list(ANONYMOUS, 'f_read', $forum_id))
+				<find><![CDATA[// Setup look and feel]]></find>
+				<action type="before-add"><![CDATA[if ($auth->acl_get_list(ANONYMOUS, 'f_read', $forum_id))
 {
 	$s_tweet = true;
 	$topic_url = generate_board_url() . '/viewtopic.' . $phpEx . '?t=' . $topic_id;
