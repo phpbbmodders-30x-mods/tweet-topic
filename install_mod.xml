@@ -16,7 +16,7 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 				<homepage><![CDATA[http://phpbbmodders.net]]></homepage>
 				<email><![CDATA[info@phpbbmodders.net]]></email>
 				<contributions-group>
-					<contributions status="current" from="2010-10-27" position="developer"/>
+					<contributions status="current" from="2010-10-27" position="Developer"/>
 				</contributions-group>
 			</author>
 			<author>
@@ -44,7 +44,7 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 				</contributions-group>
 			</author>
 		</author-group>
-		<mod-version>1.0.0a</mod-version>
+		<mod-version>1.0.1</mod-version>
 		<installation>
 			<level>easy</level>
 			<time>300</time>
@@ -60,9 +60,10 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 			</entry>
 			<entry>
 				<date>2010-12-03</date>
-				<rev-version>1.0.0a</rev-version>
+				<rev-version>1.0.1</rev-version>
 				<changelog lang="en">
 					<change><![CDATA[Bug fix to viewtopic]]></change>
+					<change><![CDATA[Add config entry to ACP for hash tag]]></change>
 				</changelog>
 			</entry>			
 		</history>
@@ -73,14 +74,12 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 		</copy>
 		<open src="viewtopic.php">
 			<edit>
-				<comment lang="en"><![CDATA[Replace phpBBModders in the edit below with your own tag.
-]]></comment>
 				<find><![CDATA[// Setup look and feel]]></find>
-				<action type="before-add"><![CDATA[if ($auth->acl_get_list(ANONYMOUS, 'f_read', $forum_id))
+				<action type="before-add"><![CDATA[if ($auth->acl_get_list(ANONYMOUS, 'f_read', $forum_id) && !empty($config['tweet_hash']))
 {
 	$s_tweet = true;
-	$topic_url = generate_board_url() . '/viewtopic.' . $phpEx . '?t=' . $topic_id;
-	$hashtag = htmlspecialchars(urlencode('#phpBBModders'));
+	$topic_url = generate_board_url() . '/viewtopic.' . $phpEx . '?f=' . $forum_id . '&amp;t=' . $topic_id;
+	$hashtag = htmlspecialchars(urlencode('#'. $config['tweet_hash']));
 }
 else
 {
@@ -145,7 +144,13 @@ if ($s_tweet)
 				<find><![CDATA[$postrow = array(]]></find>
 				<action type="after-add"><![CDATA[		'TWEET_POST' => ($s_tweet) ? $tweet : '',]]></action>
 			</edit>
-		</open>
+		</open>		
+		<open src="includes/acp/acp_board.php">
+			<edit>
+				<find><![CDATA[						'site_desc'				=> array('lang' => 'SITE_DESC',				'validate' => 'string',	'type' => 'text:40:255', 'explain' => false),]]></find>
+				<action type="after-add"><![CDATA[						'tweet_hash'				=> array('lang' => 'ACP_TWEET_HASH',				'validate' => 'string',	'type' => 'text:40:255', 'explain' => true),]]></action>
+			</edit>
+		</open>		
 		<open src="includes/acp/acp_language.php">
 			<edit>
 				<find><![CDATA['button_topic_locked', 'button_topic_new', 'button_topic_reply',]]></find>
@@ -224,7 +229,8 @@ img_button_tweet_topic = button_tweet_topic.gif*25*96]]></action>
 				<action type="after-add"><![CDATA[.tweet-post, .tweet-post a { background-image: url("{IMG_BUTTON_TWEET_POST_SRC}"); }]]></action>
 			</edit>
 		</open>
-		<diy-instructions lang="en"><![CDATA[Go to ACP > Styles and refresh your theme and imageset when done.
-Don't forget to purge your cache.]]></diy-instructions>
+		<php-installer><![CDATA[ttt_install.php]]></php-installer>
+		<diy-instructions lang="en"><![CDATA[Go to ACP > Styles and refresh your theme, template and imageset when done.  
+Visit the board settings and set your tweet hash.]]></diy-instructions>
 	</action-group>
 </mod>
