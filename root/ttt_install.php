@@ -2,7 +2,7 @@
 
 /**
 *
-* @author RMcGirr83 (Rich McGirr) rmcgirr83@gmail.com 
+* @author RMcGirr83 (Rich McGirr) rmcgirr83@gmail.com
 * @package Tweet This topic
 * @version $Id ttt_install.php 1.0.0 2010-12-04
 * @copyright (c) 2010 RMcGirr83 ( http://www.phpbbmodders.net/ )
@@ -39,7 +39,7 @@ if (!file_exists($phpbb_root_path . 'umil/umil_auto.' . $phpEx))
 * 'UNINSTALL_' . $mod_name
 * 'UNINSTALL_' . $mod_name . '_CONFIRM'
 */
-$language_file = 'mods/info_acp_tweet_this_topic';
+$language_file = 'mods/info_acp_tweet_this';
 
 // The name of the mod to be displayed during installation.
 $mod_name = 'ACP_TWEET_THIS_TITLE';
