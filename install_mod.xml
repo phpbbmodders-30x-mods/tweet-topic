@@ -78,8 +78,8 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 				<action type="before-add"><![CDATA[if ($auth->acl_get_list(ANONYMOUS, 'f_read', $forum_id) && !empty($config['tweet_hash']))
 {
 	$s_tweet = true;
-	$topic_url = generate_board_url() . '/viewtopic.' . $phpEx . '?f=' . $forum_id . '&amp;t=' . $topic_id;
-	$hashtag = htmlspecialchars(urlencode('#'. $config['tweet_hash']));
+	$topic_url = generate_board_url() . '/viewtopic.' . $phpEx . '?f=' . $forum_id . '%26t=' . $topic_id;
+	$hashtag = htmlspecialchars(urlencode('#'.$config['tweet_hash']));
 }
 else
 {
@@ -106,17 +106,19 @@ if ($s_tweet)
 			</edit>
 			<edit>
 				<find><![CDATA[$template->assign_vars(array(]]></find>
-				<action type="after-add"><![CDATA[	'S_TWEET' => $s_tweet,
-	'TWEET_TOPIC' => ($s_tweet) ? $tweet : '',]]></action>
+				<action type="after-add"><![CDATA[	'S_TWEET' 		=> $s_tweet,
+	'TWEET_TOPIC' 	=> ($s_tweet) ? $tweet : '',]]></action>
 			</edit>
 			<edit>
 				<find><![CDATA[$post_unread = (isset($topic_tracking_info[$topic_id]) && $row['post_time'] > $topic_tracking_info[$topic_id]) ? true : false;]]></find>
 				<action type="after-add"><![CDATA[	// Make sure the tweet is no more than 140 chars.
 	if ($s_tweet)
 	{
+		$topic_url = generate_board_url() . '/viewtopic.' . $phpEx . '?p=' . $row['post_id'];
 		$post_url = $topic_url . '%23p' . $row['post_id'];
 		$post_subject = htmlspecialchars(urlencode($row['post_subject'] . ': '));
-		$strlen = strlen($post_subject . truncate_string($row['post_text'], 60, 255, true, '... ') . $post_url);
+		$tweet_post = preg_replace('#<[^>]*>(.*<[^>]*>)?#Usi', '', $row['post_text']);
+		$strlen = strlen($post_subject . truncate_string($tweet_post, 60, 255, true, '... ') . $post_url);
 		if ($strlen > 140)
 		{
 			// Check that the post subject is not making this to long already.
@@ -130,19 +132,19 @@ if ($s_tweet)
 			else
 			{
 				$chars = 140 - strlen($post_subject . ': ' . $post_url);
-				$tweet = truncate_string($row['post_text'], $chars, 255, true, '');
+				$tweet = truncate_string($tweet_post, $chars, 255, true, '');
 				$tweet = $post_subject . $tweet . ': ' . $post_url;
 			}
 		}
 		else
 		{
-			$tweet = $post_subject . truncate_string($row['post_text'], 60, 255, true, '... ') . $post_url;
+			$tweet = $post_subject . truncate_string($tweet_post, 60, 255, true, '... ') .' '. $post_url;
 		}
 	}]]></action>
 			</edit>
 			<edit>
 				<find><![CDATA[$postrow = array(]]></find>
-				<action type="after-add"><![CDATA[		'TWEET_POST' => ($s_tweet) ? $tweet : '',]]></action>
+				<action type="after-add"><![CDATA[		'TWEET_POST' 			=> ($s_tweet) ? $tweet : '',]]></action>
 			</edit>
 		</open>		
 		<open src="includes/acp/acp_board.php">
@@ -196,6 +198,13 @@ img_button_tweet_topic = button_tweet_topic.gif*25*96]]></action>
 	<!-- ENDIF -->]]></find>
 				<action type="after-add"><![CDATA[		<!-- IF not S_IS_BOT and S_TWEET --><div class="tweet-topic"><a href="http://twitter.com/home?status={TWEET_TOPIC}" title="{L_TWEET_TOPIC}"><span></span>{L_TWEET_TOPIC}</a></div><!-- ENDIF -->]]></action>
 			</edit>
+			<edit>
+				<find><![CDATA[<!-- IF postrow.U_EDIT or postrow.U_DELETE]]></find>
+				<inline-edit>
+					<inline-find><![CDATA[postrow.U_DELETE]]></inline-find>
+					<inline-action type="after-add"><![CDATA[ or S_TWEET]]></inline-action>
+				</inline-edit>
+			</edit>	
 			<edit>
 				<find><![CDATA[<!-- IF postrow.U_INFO --><li class="info-icon"><a href="{postrow.U_INFO}" title="{L_INFORMATION}"><span>{L_INFORMATION}</span></a></li><!-- ENDIF -->]]></find>
 				<action type="after-add"><![CDATA[					<!-- IF not S_IS_BOT and S_TWEET --><li class="tweet-post"><a href="http://twitter.com/home?status={postrow.TWEET_POST}" title="{L_TWEET_POST}"><span>{L_TWEET_POST}</span></a></li><!-- ENDIF -->]]></action>
