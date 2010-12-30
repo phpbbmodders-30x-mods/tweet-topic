@@ -8,7 +8,7 @@
 		<license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
 		<title lang="en"><![CDATA[Tweet this topic or post]]></title>
 		<description lang="en"><![CDATA[Twitter seems to be getting more popular and I myself have found myself delving into the api's a few times already.
-Simple enough - as per the MOD title, this MOD allows you to tweet this topic or post. If you're not logged in when you click the link, simply log in and you'll redirected with the tweet still kept (not done by me, you can thank twitter devs for that).]]></description>
+Simple enough - as per the MOD title, this MOD allows you to tweet this topic or post. If you're not logged in when you click the link, simply log in and you'll be redirected with the tweet still kept (not done by me, you can thank twitter devs for that).  The forum must have guest permissions to at least read the topics/posts.  If guests do not have those permissions or if the hash isn't set within the board settings of the forum, then the tween buttons will not display.]]></description>
 		<author-group>
 			<author>
 				<realname><![CDATA[Jari Kanerva]]></realname>
@@ -240,6 +240,6 @@ img_button_tweet_topic = button_tweet_topic.gif*25*96]]></action>
 		</open>
 		<php-installer><![CDATA[ttt_install.php]]></php-installer>
 		<diy-instructions lang="en"><![CDATA[Go to ACP > Styles and refresh your theme, template and imageset when done.  
-Visit the board settings and set your tweet hash.]]></diy-instructions>
+Visit the board settings and set your tweet hash without it the tweet buttons will not display.]]></diy-instructions>
 	</action-group>
 </mod>
