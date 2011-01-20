@@ -44,7 +44,7 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 				</contributions-group>
 			</author>
 		</author-group>
-		<mod-version>1.0.1</mod-version>
+		<mod-version>1.0.1a</mod-version>
 		<installation>
 			<level>easy</level>
 			<time>300</time>
@@ -64,6 +64,13 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 				<changelog lang="en">
 					<change><![CDATA[Bug fix to viewtopic]]></change>
 					<change><![CDATA[Add config entry to ACP for hash tag]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date>2011-01-20</date>
+				<rev-version>1.0.1a</rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Validation fixes]]></change>
 				</changelog>
 			</entry>			
 		</history>
