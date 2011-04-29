@@ -27,7 +27,7 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 				<contributions-group>
 					<contributions status="current" from="2010-10-27" position="Developer"/>
 				</contributions-group>
-			</author>			
+			</author>
 			<author>
 				<realname><![CDATA[William Jacoby]]></realname>
 				<username><![CDATA[bonelifer]]></username>
@@ -72,7 +72,7 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 				<changelog lang="en">
 					<change><![CDATA[Validation fixes]]></change>
 				</changelog>
-			</entry>			
+			</entry>
 		</history>
 	</header>
 	<action-group>
@@ -123,7 +123,9 @@ if ($s_tweet)
 	{
 		$topic_url = generate_board_url() . '/viewtopic.' . $phpEx . '?p=' . $row['post_id'];
 		$post_url = $topic_url . '%23p' . $row['post_id'];
-		$post_subject = htmlspecialchars(urlencode($row['post_subject'] . ': '));
+		// Remove search highlight span if post subject contains the search keyword.
+		$post_subject = str_replace(array('<span class="posthilit">', '</span>'), '', $row['post_subject']);
+		$post_subject = htmlspecialchars(urlencode($post_subject . ': '));
 		$tweet_post = preg_replace('#<[^>]*>(.*<[^>]*>)?#Usi', '', $row['post_text']);
 		$strlen = strlen($post_subject . truncate_string($tweet_post, 60, 255, true, '... ') . $post_url);
 		if ($strlen > 140)
@@ -153,13 +155,13 @@ if ($s_tweet)
 				<find><![CDATA[$postrow = array(]]></find>
 				<action type="after-add"><![CDATA[		'TWEET_POST' 			=> ($s_tweet) ? $tweet : '',]]></action>
 			</edit>
-		</open>		
+		</open>
 		<open src="includes/acp/acp_board.php">
 			<edit>
 				<find><![CDATA[						'site_desc'				=> array('lang' => 'SITE_DESC',				'validate' => 'string',	'type' => 'text:40:255', 'explain' => false),]]></find>
 				<action type="after-add"><![CDATA[						'tweet_hash'				=> array('lang' => 'ACP_TWEET_HASH',				'validate' => 'string',	'type' => 'text:40:255', 'explain' => true),]]></action>
 			</edit>
-		</open>		
+		</open>
 		<open src="includes/acp/acp_language.php">
 			<edit>
 				<find><![CDATA['button_topic_locked', 'button_topic_new', 'button_topic_reply',]]></find>
@@ -211,7 +213,7 @@ img_button_tweet_topic = button_tweet_topic.gif*25*96]]></action>
 					<inline-find><![CDATA[postrow.U_DELETE]]></inline-find>
 					<inline-action type="after-add"><![CDATA[ or S_TWEET]]></inline-action>
 				</inline-edit>
-			</edit>	
+			</edit>
 			<edit>
 				<find><![CDATA[<!-- IF postrow.U_INFO --><li class="info-icon"><a href="{postrow.U_INFO}" title="{L_INFORMATION}"><span>{L_INFORMATION}</span></a></li><!-- ENDIF -->]]></find>
 				<action type="after-add"><![CDATA[					<!-- IF not S_IS_BOT and S_TWEET --><li class="tweet-post"><a href="http://twitter.com/home?status={postrow.TWEET_POST}" title="{L_TWEET_POST}"><span>{L_TWEET_POST}</span></a></li><!-- ENDIF -->]]></action>
@@ -246,7 +248,7 @@ img_button_tweet_topic = button_tweet_topic.gif*25*96]]></action>
 			</edit>
 		</open>
 		<php-installer><![CDATA[ttt_install.php]]></php-installer>
-		<diy-instructions lang="en"><![CDATA[Go to ACP > Styles and refresh your theme, template and imageset when done.  
+		<diy-instructions lang="en"><![CDATA[Go to ACP > Styles and refresh your theme, template and imageset when done.
 Visit the board settings and set your tweet hash without it the tweet buttons will not display.]]></diy-instructions>
 	</action-group>
 </mod>
