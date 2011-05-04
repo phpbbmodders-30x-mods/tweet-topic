@@ -44,7 +44,7 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 				</contributions-group>
 			</author>
 		</author-group>
-		<mod-version>1.0.1a</mod-version>
+		<mod-version>1.0.1b</mod-version>
 		<installation>
 			<level>easy</level>
 			<time>300</time>
@@ -73,6 +73,13 @@ Simple enough - as per the MOD title, this MOD allows you to tweet this topic or
 					<change><![CDATA[Validation fixes]]></change>
 				</changelog>
 			</entry>
+			<entry>
+				<date>2011-05-04</date>
+				<rev-version>1.0.1b</rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Viewtopic fix for hilight span tag]]></change>
+				</changelog>
+			</entry>			
 		</history>
 	</header>
 	<action-group>
