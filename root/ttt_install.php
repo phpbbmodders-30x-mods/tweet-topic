@@ -4,8 +4,8 @@
 *
 * @author RMcGirr83 (Rich McGirr) rmcgirr83@gmail.com
 * @package Tweet This topic
-* @version $Id ttt_install.php 1.0.0 2010-12-04
-* @copyright (c) 2010 RMcGirr83 ( http://www.phpbbmodders.net/ )
+* @version $Id ttt_install.php 1.0.2 2011-05-31
+* @copyright (c) 2011 RMcGirr83 ( http://www.phpbbmodders.net/ )
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
 */
@@ -67,8 +67,11 @@ $versions = array(
 		'config_add' => array(
 			array('tweet_hash', ''),
 		),
-		'cache_purge' => array(''),
 	),
+	// Version 1.0.2
+	'1.0.2'	=> array(
+		'cache_purge' => array(''),
+	),	
 );
 
 // Include the UMIF Auto file and everything else will be handled automatically.
