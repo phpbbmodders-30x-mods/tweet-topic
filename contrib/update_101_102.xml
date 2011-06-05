@@ -72,20 +72,21 @@ else
 {
 	$s_tweet = false;
 }]]></find>
-				<action type="replace-with"><![CDATA[//-- mod : Tweet topic
+				<action type="replace-with"><![CDATA[//-- mod : Tweet post
 //-- add
-if ($auth->acl_get_list(ANONYMOUS, 'f_read', $forum_id) && !empty($config['tweet_hash']))
+// we don't care if the hash is populated or not
+$hashtag = '';
+if ($auth->acl_get_list(ANONYMOUS, 'f_read', $forum_id))
 {
 	$s_tweet = true;
-	$topic_url = generate_board_url() . '/viewtopic.' . $phpEx . '?f=' . $forum_id . '&amp;t=' . $topic_id;
-	//$hashtag = htmlspecialchars(urlencode('#'. $config['tweet_hash']));
-	$hashtag = '%23'. $config['tweet_hash'];
+	$topic_url = urlencode(html_entity_decode(generate_board_url() . '/viewtopic.' . $phpEx . '?f=' . $forum_id . '&amp;t=' . $topic_id));
+	$hashtag = !empty($config['tweet_hash']) ? $config['tweet_hash'] : '';
 }
 else
 {
 	$s_tweet = false;
 }
-//-- fin : Tweet post]]></action>
+//-- fin : Tweet topic]]></action>
 			</edit>
 			<edit>
 				<find><![CDATA[// Make sure the tweet is no more than 140 chars.
@@ -103,20 +104,22 @@ if ($s_tweet)
 		$tweet = htmlspecialchars(urlencode($topic_data['topic_title'] . ' ')) . $topic_url . ' ' . $hashtag;
 	}
 }]]></find>
-				<action type="replace-with"><![CDATA[//-- mod : Tweet topic
+				<action type="replace-with"><![CDATA[//-- mod : Tweet post
 //-- add
 // Make sure the tweet is no more than 140 chars (changed to 121 due to twitters short url thingy).
 if ($s_tweet)
 {
-	$strlen = strlen(htmlspecialchars(urlencode($topic_data['topic_title'])) . ': ' . $hashtag);
-	if ($strlen > 121)
+	$strlen = strlen($topic_data['topic_title']);
+	// we have to account for twitter tossing in " via " into the tweet...hence the 6 below
+	$strlen = !empty($hashtag) ? $strlen + strlen($hashtag) + 6 : $strlen;
+	if ($strlen > 120)
 	{
-		$chars = 121 - $strlen;
-		$tweet_text = htmlspecialchars(urlencode(truncate_string($topic_data['topic_title'], $chars, 255, true, '...'))) . ': ' . $hashtag;
+		$chars = 120 - $strlen;
+		$tweet_text = htmlspecialchars(urlencode(truncate_string($topic_data['topic_title'], $chars, 140, true, '...: ')));
 	}
 	else
 	{
-		$tweet_text = htmlspecialchars(urlencode($topic_data['topic_title'])) . ': ' . $hashtag;
+		$tweet_text = htmlspecialchars(urlencode($topic_data['topic_title'] . ': '));
 	}
 }
 //-- fin : Tweet topic]]></action>
@@ -129,6 +132,7 @@ if ($s_tweet)
 	'S_TWEET' 		=> $s_tweet,
 	'TWEET_TEXT' 	=> $tweet_text,
 	'TWEET_URL'		=> $topic_url,
+	'TWEET_VIA'		=> !empty($hashtag) ? $hashtag : '',
 //-- fin : Tweet topic]]></action>
 			</edit>
 			<edit>
@@ -137,9 +141,7 @@ if ($s_tweet)
 	{
 		$topic_url = generate_board_url() . '/viewtopic.' . $phpEx . '?p=' . $row['post_id'];
 		$post_url = $topic_url . '%23p' . $row['post_id'];
-		// Remove search highlight span if post subject contains the search keyword.
-		$post_subject = str_replace(array('<span class="posthilit">', '</span>'), '', $row['post_subject']);
-		$post_subject = htmlspecialchars(urlencode($post_subject . ': '));
+		$post_subject = htmlspecialchars(urlencode($row['post_subject'] . ': '));
 		$tweet_post = preg_replace('#<[^>]*>(.*<[^>]*>)?#Usi', '', $row['post_text']);
 		$strlen = strlen($post_subject . truncate_string($tweet_post, 60, 255, true, '... ') . $post_url);
 		if ($strlen > 140)
@@ -168,23 +170,24 @@ if ($s_tweet)
 //-- add
 	if ($s_tweet)
 	{
-		$post_url = generate_board_url() . '/viewtopic.' . $phpEx . '?p=' . $row['post_id'] . '%23p' . $row['post_id'];
-		//$post_url = $topic_url . '%23p' . $row['post_id'];
+		$post_url = htmlspecialchars(generate_board_url() . '/viewtopic.' . $phpEx . '?p=' . $row['post_id'] . '%23p' . $row['post_id']);
 		// first let's remove any bbcode, it doesn't do any good anyway and makes the tweet shorter
-		$twit_regex = array('#<[^>]*>(.*<[^>]*>)?#Usi', // HTML code magic_urls and smilies
-			'#\[/?[^\[\]]+\]#mi', // Strip all bbcode tags
+		$twit_regex = array('#\[/?[^\[\]]+\]#mi', // Strip all bbcode tags
+			'#<[^>]*>(.*<[^>]*>)?#Usi', // HTML code magic_urls and smilies
 		);
-		$tweet_text = preg_replace($twit_regex, ' ', $row['post_text']);
-		$strlen = strlen($tweet_text . ': ' . $hashtag);
-		// Make sure the tweet is no more than 140 chars (changed to 121 due to twitters short url thingy).
-		if ($strlen > 121)
+		
+		$tweet_text = preg_replace($twit_regex, '', $row['post_text']);
+		$strlen = strlen($tweet_text);
+		$strlen = !empty($hashtag) ? $strlen + strlen($hashtag) + 6 : $strlen;
+		// Make sure the tweet is no more than 140 chars (changed to 120 due to twitters short url thingy).
+		if ($strlen > 120)
 		{
-			$chars = 121 - $strlen;
-			$tweet_text = truncate_string($tweet_text, $chars, 255, true, '...') . ': ' . $hashtag;
+			$chars = 120 - $strlen;
+			$tweet_text = htmlspecialchars(urlencode(truncate_string($tweet_text, $chars, 120, true, '...:')));
 		}
 		else
 		{
-			$tweet_text = $tweet_text . ': ' . $hashtag;
+			$tweet_text = htmlspecialchars(urlencode($tweet_text . ': '));
 		}
 	}
 //-- fin : Tweet post]]></action>
@@ -201,15 +204,15 @@ if ($s_tweet)
 		<open src="styles/prosilver/template/viewtopic_body.html">
 			<edit>
 				<find><![CDATA[		<!-- IF not S_IS_BOT and S_TWEET --><div class="tweet-topic"><a href="http://twitter.com/home?status={TWEET_TOPIC}" title="{L_TWEET_TOPIC}"><span></span>{L_TWEET_TOPIC}</a></div><!-- ENDIF -->]]></find>
-				<action type="replace-with"><![CDATA[	<!-- IF not S_IS_BOT and S_TWEET --><div class="tweet-topic"><a href="http://twitter.com/share?url={TWEET_URL}&text={TWEET_TEXT}" title="{L_TWEET_TOPIC}"><span></span>{L_TWEET_TOPIC}</a></div><!-- ENDIF -->]]></action>
+				<action type="replace-with"><![CDATA[<!-- IF not S_IS_BOT and S_TWEET --><div class="tweet-topic"><a href="http://twitter.com/share?url={TWEET_URL}&amp;text={TWEET_TEXT}<!-- IF TWEET_VIA -->&amp;via={TWEET_VIA}<!-- ENDIF -->" title="{L_TWEET_TOPIC}"><span></span>{L_TWEET_TOPIC}</a></div><!-- ENDIF -->]]></action>
 			</edit>
 			<edit>
 				<find><![CDATA[					<!-- IF not S_IS_BOT and S_TWEET --><li class="tweet-post"><a href="http://twitter.com/home?status={postrow.TWEET_POST}" title="{L_TWEET_POST}"><span>{L_TWEET_POST}</span></a></li><!-- ENDIF -->]]></find>
-				<action type="replace-with"><![CDATA[					<!-- IF not S_IS_BOT and S_TWEET --><li class="tweet-post"><a href="http://twitter.com/share?text={postrow.TWEET_TEXT}&amp;url={postrow.TWEET_URL}" title="{L_TWEET_POST}"><span>{L_TWEET_POST}</span></a></li><!-- ENDIF -->]]></action>
+				<action type="replace-with"><![CDATA[					<!-- IF not S_IS_BOT and S_TWEET --><li class="tweet-post"><a href="http://twitter.com/share?text={postrow.TWEET_TEXT}&amp;url={postrow.TWEET_URL}<!-- IF TWEET_VIA -->&amp;via={TWEET_VIA}<!-- ENDIF -->" title="{L_TWEET_POST}"><span>{L_TWEET_POST}</span></a></li><!-- ENDIF -->]]></action>
 			</edit>
 		</open>
 		<php-installer><![CDATA[ttt_install.php]]></php-installer>
 		<diy-instructions lang="en"><![CDATA[Go to ACP > Styles and refresh your theme, template and imageset when done.
-Visit the board settings and set your tweet hash without it the tweet buttons will not display.]]></diy-instructions>
+Visit the board settings and set your tweet hash if desired.]]></diy-instructions>
 	</action-group>
 </mod>
